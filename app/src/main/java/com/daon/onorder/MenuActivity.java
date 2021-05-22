@@ -1,13 +1,17 @@
 package com.daon.onorder;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
@@ -21,6 +25,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -54,12 +59,17 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
@@ -144,6 +154,8 @@ public class MenuActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_menu);
 
+        checkPermission();
+
         context = this;
         pref = getSharedPreferences("pref", MODE_PRIVATE);
         taskTimer.setTime(basic, context);
@@ -186,7 +198,10 @@ public class MenuActivity extends AppCompatActivity{
 
         bodyLayout = findViewById(R.id.menuactivity_layout_menu);
 
-        Log.d("daon_test", "id = "+pref.getString("storecode", ""));
+        Log.d("daon_test", "id1 = "+pref.getString("storecode", ""));
+
+        appendLog("id = "+pref.getString("storecode", ""));
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://15.164.232.164:5000/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -535,7 +550,11 @@ public class MenuActivity extends AppCompatActivity{
         });
     }
 
-
+    public void checkPermission(){
+        if(checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        }
+    }
     public void setList() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://15.164.232.164:5000/")
@@ -705,6 +724,8 @@ public class MenuActivity extends AppCompatActivity{
             menu8.setTextColor(Color.parseColor("#ffffff"));
             menu9.setTextColor(Color.parseColor("#ffffff"));
 
+            Log.d("daon", "aaaaaa");
+
             //put your ArrayList data in bundle
             bundle.putSerializable("list", (ArrayList<MenuModel>) menu_list.get(0));
             bundle.putInt("position", 0);
@@ -742,7 +763,16 @@ public class MenuActivity extends AppCompatActivity{
     }
 
     public void callDetail(int i) {
-        Log.d("daon_test", "Call = "+ i);
+        try {
+            Log.d("daon_test", Environment.getExternalStorageDirectory()
+                    .getAbsolutePath() + "/download/logdata.txt");
+        } catch (Exception e) {
+            Log.d("daon_test ssssss", e.toString());
+        }
+
+        appendLog("call detail");
+
+        Log.d("daon_test1 ", "Call = "+ i);
         DetailFragment detailFragment = new DetailFragment();
         Bundle bundle = new Bundle();
         //put your ArrayList data in bundle
@@ -875,6 +905,7 @@ public class MenuActivity extends AppCompatActivity{
                     all_price = 0;
                     order_price.setText("총 0원 주문하기");
                     isOrder = false;
+                    appendLog("sendFirebaseOrder onComplete  금액 : " + removePrice + "  테이블 : " + pref.getString("table", ""));
                     Toast toast = Toast.makeText(MenuActivity.this, "주문이 전달되었습니다.", Toast.LENGTH_LONG);
                     toast.setGravity(Gravity.CENTER, 0, 0);
                     toast.show();
@@ -886,6 +917,49 @@ public class MenuActivity extends AppCompatActivity{
             }
         });
     }
+
+    public String getTime()
+    {
+        long now = System.currentTimeMillis();
+        Date mDate = new Date(now);
+        SimpleDateFormat simpleDate = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        String getTime = simpleDate.format(mDate);
+        return getTime;
+    }
+
+    public void appendLog(String text)
+    {
+        File logFile = null;
+        if( Build.VERSION.SDK_INT < 29) logFile = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+"/lolSaveFiles/log.txt");
+        else logFile = MenuActivity.this.getExternalFilesDir("/lolSaveFiles");
+
+        if (!logFile.exists())
+        {
+            try
+            {
+                logFile.createNewFile();
+            }
+            catch (IOException e)
+            {
+                Log.d("File", "saving error"+e.toString());
+
+                e.printStackTrace();
+            }
+        }
+        try
+        {
+            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile+"/logdata.txt", true));
+            buf.append(getTime()+"    "+text);
+            buf.newLine();
+            buf.close();
+            buf = null;
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     public void sendFirebasecall(){
         Calendar calendar = Calendar.getInstance();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss",  Locale.getDefault());
@@ -1017,7 +1091,7 @@ public class MenuActivity extends AppCompatActivity{
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        appendLog("onActivityResult resultCode" + String.valueOf(resultCode));
         if (resultCode == RESULT_OK && data != null) {
             HashMap<String, String> m_hash = (HashMap<String, String>) data.getSerializableExtra("result");
             try {
@@ -1062,42 +1136,45 @@ public class MenuActivity extends AppCompatActivity{
             }
 
 //            Toast.makeText(this, "성공" + (m_hash.get("AuthNum")), Toast.LENGTH_LONG).show();
+            if (!m_hash.get("AuthNum").replace(" ", "").equals("") || m_hash.get("AuthNum") == null){
+                Toast.makeText(this, m_hash.get("Message1"), Toast.LENGTH_LONG).show();
 
-            Retrofit retrofit = new Retrofit.Builder()
-                    .baseUrl("http://15.164.232.164:5000/")
-                    .addConverterFactory(new NullOnEmptyConverterFactory())
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
-            InterfaceApi interfaceApi = retrofit.create(InterfaceApi.class);
-            interfaceApi.payment(pref.getString("storecode", ""), m_hash.get("Classification"), m_hash.get("TelegramType"), m_hash.get("Dpt_Id"), m_hash.get("Enterprise_Info"), m_hash.get("Full_Text_Num"),
-                    m_hash.get("Status"), m_hash.get("Authdate"), m_hash.get("Message1"), m_hash.get("Message2"), m_hash.get("AuthNum"), m_hash.get("FranchiseID"),
-                    m_hash.get("IssueCode"), m_hash.get("CardName"), m_hash.get("PurchaseCode"), m_hash.get("PurchaseName"), m_hash.get("Remain"),
-                    m_hash.get("point1"), m_hash.get("point2"), m_hash.get("point3"), m_hash.get("notice1"), m_hash.get("notice2"), m_hash.get("CardType"),
-                    m_hash.get("CardNo"), m_hash.get("SWModelNum"), m_hash.get("ReaderModelNum"), m_hash.get("VanTr"), m_hash.get("Cardbin"), String.valueOf(all_price)).enqueue(new Callback<JsonObject>() {
-                @Override
-                public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                    Log.d("daon", "isSuccessful = "+response.isSuccessful());
-                    if (response.isSuccessful()) {
-                        sendOrder();
-                        prevAuthNum = m_hash.get("AuthNum");
-                        prevAuthDate = m_hash.get("Authdate");
-                        removePrice = String.valueOf(all_price);
-                        orderAdapter.removeData();
-                        all_price = 0;
-                        order_price.setText("총 0원 주문하기");
-                        isOrder = false;
-
-
+            }else {
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl("http://15.164.232.164:5000/")
+                        .addConverterFactory(new NullOnEmptyConverterFactory())
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+                InterfaceApi interfaceApi = retrofit.create(InterfaceApi.class);
+                interfaceApi.payment(pref.getString("storecode", ""), m_hash.get("Classification"), m_hash.get("TelegramType"), m_hash.get("Dpt_Id"), m_hash.get("Enterprise_Info"), m_hash.get("Full_Text_Num"),
+                        m_hash.get("Status"), m_hash.get("Authdate"), m_hash.get("Message1"), m_hash.get("Message2"), m_hash.get("AuthNum"), m_hash.get("FranchiseID"),
+                        m_hash.get("IssueCode"), m_hash.get("CardName"), m_hash.get("PurchaseCode"), m_hash.get("PurchaseName"), m_hash.get("Remain"),
+                        m_hash.get("point1"), m_hash.get("point2"), m_hash.get("point3"), m_hash.get("notice1"), m_hash.get("notice2"), m_hash.get("CardType"),
+                        m_hash.get("CardNo"), m_hash.get("SWModelNum"), m_hash.get("ReaderModelNum"), m_hash.get("VanTr"), m_hash.get("Cardbin"), String.valueOf(all_price)).enqueue(new Callback<JsonObject>() {
+                    @Override
+                    public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                        Log.d("daon", "isSuccessful = " + response.isSuccessful());
+                        appendLog("isSuccessful = " + response.isSuccessful());
+                        if (response.isSuccessful()) {
+                            sendOrder();
+                            prevAuthNum = m_hash.get("AuthNum");
+                            prevAuthDate = m_hash.get("Authdate");
+                            removePrice = String.valueOf(all_price);
+                            orderAdapter.removeData();
+                            all_price = 0;
+                            order_price.setText("총 0원 주문하기");
+                            isOrder = false;
+                        }
 
                     }
 
-                }
-
-                @Override
-                public void onFailure(Call<JsonObject> call, Throwable t) {
-                    t.printStackTrace();
-                }
-            });
+                    @Override
+                    public void onFailure(Call<JsonObject> call, Throwable t) {
+                        t.printStackTrace();
+                        appendLog(t.getMessage());
+                    }
+                });
+            }
 
 
         } else if (resultCode == RESULT_FIRST_USER && data != null) {
