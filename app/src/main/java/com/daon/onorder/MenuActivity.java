@@ -252,7 +252,7 @@ public class MenuActivity extends AppCompatActivity{
 //                bundle.putSerializable("list", cart_list);
 //                cartFragment.setArguments(bundle);
 //                fragmentManager.beginTransaction().replace(R.id.menuactivity_layout_menu, cartFragment).commit();
-                setPayment(removePrice,"cancle");
+//                setPayment(removePrice,"cancle");
             }
         });
         order_price = findViewById(R.id.menuactivity_text_price);
@@ -1019,9 +1019,9 @@ public class MenuActivity extends AppCompatActivity{
 
     public void setPayment(String amount, String type) {
         Log.d("daon", "payment = " + amount);
-        amount = "54000";
-        prevAuthNum = "36217123    ";
-        prevAuthDate = "210523";
+//        amount = "54000";
+//        prevAuthNum = "36217123    ";
+//        prevAuthDate = "210523";
         int i_amount = Integer.parseInt(amount);
         int tax = (i_amount/100)*10;
         int aamount = (i_amount/100)*90;
