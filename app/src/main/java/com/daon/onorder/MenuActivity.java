@@ -1101,7 +1101,33 @@ public class MenuActivity extends AppCompatActivity{
             }
 
             if (m_hash.get("VanTr") == null){
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl("http://15.164.232.164:5000/")
+                        .addConverterFactory(new NullOnEmptyConverterFactory())
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+                InterfaceApi interfaceApi = retrofit.create(InterfaceApi.class);
+                interfaceApi.payment(pref.getString("storecode", ""), m_hash.get("Classification"), m_hash.get("TelegramType"), m_hash.get("Dpt_Id"), m_hash.get("Enterprise_Info"), m_hash.get("Full_Text_Num"),
+                        m_hash.get("Status"), m_hash.get("Authdate"), m_hash.get("Message1"), m_hash.get("Message2"), m_hash.get("AuthNum"), m_hash.get("FranchiseID"),
+                        m_hash.get("IssueCode"), m_hash.get("CardName"), m_hash.get("PurchaseCode"), m_hash.get("PurchaseName"), m_hash.get("Remain"),
+                        m_hash.get("point1"), m_hash.get("point2"), m_hash.get("point3"), m_hash.get("notice1"), m_hash.get("notice2"), m_hash.get("CardType"),
+                        m_hash.get("CardNo"), m_hash.get("SWModelNum"), m_hash.get("ReaderModelNum"), m_hash.get("VanTr"), m_hash.get("Cardbin"), String.valueOf(all_price)).enqueue(new Callback<JsonObject>() {
+                    @Override
+                    public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
+                        Log.d("daon", "isSuccessful = " + response.isSuccessful());
+                        appendLog("isSuccessful = " + response.isSuccessful());
+                        if (response.isSuccessful()) {
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<JsonObject> call, Throwable t) {
+                        t.printStackTrace();
+                        appendLog(t.getMessage());
+                    }
+                });
                 Toast.makeText(this, m_hash.get("Message1"), Toast.LENGTH_LONG).show();
+
             }else {
                 if (m_hash != null) {
                     prevAuthNum = m_hash.get("AuthNum");
