@@ -1099,44 +1099,20 @@ public class MenuActivity extends AppCompatActivity{
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            if (m_hash != null) {
-                prevAuthNum = m_hash.get("AuthNum");
-                prevAuthDate = m_hash.get("Authdate");
-                prevClassfication = m_hash.get("Classification");
-                cardname = m_hash.get("CardName");
-                company = m_hash.get("PurchaseName");
-                vanTr = m_hash.get("VanTr");
-                prevCardNo = m_hash.get("CardNo");
-
-                //KTC 인증용 출력
-                System.out.println("recv [TelegramType]:: " + (m_hash.get("TelegramType")));
-                System.out.println("recv [Dpt_Id]:: " + (m_hash.get("Dpt_Id")));
-                System.out.println("recv [Enterprise_Info]:: " + (m_hash.get("Enterprise_Info")));
-                System.out.println("recv [Full_Text_Num]:: " + (m_hash.get("Full_Text_Num")));
-                System.out.println("recv [Status]:: " + (m_hash.get("Status")));
-                System.out.println("recv [CardType]:: " + (m_hash.get("CardType")));              //'N':신용카드 'G':기프트카드 'C':체크카드 'P'선불카드 'P'고운맘 바우처
-                System.out.println("recv [Authdate]:: " + (m_hash.get("Authdate")));
-                System.out.println("recv [Message1]:: " + (m_hash.get("Message1")));
-                System.out.println("recv [Message2]:: " + (m_hash.get("Message2")));
-                System.out.println("recv [VanTr]:: " + (m_hash.get("VanTr")));
-                System.out.println("recv [AuthNum]:: " + (m_hash.get("AuthNum")));
-                System.out.println("recv [FranchiseID]:: " + (m_hash.get("FranchiseID")));
-                System.out.println("recv [IssueCode]:: " + (m_hash.get("IssueCode")));
-                System.out.println("recv [CardName]:: " + (m_hash.get("CardName")));
-                System.out.println("recv [PurchaseCode]:: " + (m_hash.get("PurchaseCode")));
-                System.out.println("recv [PurchaseName]:: " + (m_hash.get("PurchaseName")));
-                System.out.println("recv [Remain]:: " + (m_hash.get("Remain")));
-                System.out.println("recv [point1]:: " + (m_hash.get("point1")));
-                System.out.println("recv [point2]:: " + (m_hash.get("point2")));
-                System.out.println("recv [point3]:: " + (m_hash.get("point3")));
-                System.out.println("recv [notice1]:: " + (m_hash.get("notice1")));
-                System.out.println("recv [notice2]:: " + (m_hash.get("notice2")));
-                System.out.println("recv [CardNo]:: " + (m_hash.get("CardNo")));
-            }
 
             if (m_hash.get("VanTr") == null){
                 Toast.makeText(this, m_hash.get("Message1"), Toast.LENGTH_LONG).show();
             }else {
+                if (m_hash != null) {
+                    prevAuthNum = m_hash.get("AuthNum");
+                    prevAuthDate = m_hash.get("Authdate");
+                    prevClassfication = m_hash.get("Classification");
+                    cardname = m_hash.get("CardName");
+                    company = m_hash.get("PurchaseName");
+                    vanTr = m_hash.get("VanTr");
+                    prevCardNo = m_hash.get("CardNo");
+                }
+
                 Retrofit retrofit = new Retrofit.Builder()
                         .baseUrl("http://15.164.232.164:5000/")
                         .addConverterFactory(new NullOnEmptyConverterFactory())
@@ -1172,6 +1148,8 @@ public class MenuActivity extends AppCompatActivity{
                     }
                 });
             }
+
+
         } else if (resultCode == RESULT_FIRST_USER && data != null) {
             //케이에스체크IC 초기버전 이후 가맹점 다운로드 없이 승인 가능
             //Toast.makeText(this, "케이에스체크IC 에서 가맹점 다운로드 후 사용하시기 바랍니다", Toast.LENGTH_LONG).show();
