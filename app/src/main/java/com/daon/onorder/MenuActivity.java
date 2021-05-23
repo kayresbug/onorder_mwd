@@ -252,8 +252,7 @@ public class MenuActivity extends AppCompatActivity{
 //                bundle.putSerializable("list", cart_list);
 //                cartFragment.setArguments(bundle);
 //                fragmentManager.beginTransaction().replace(R.id.menuactivity_layout_menu, cartFragment).commit();
-
-//                setPayment(removePrice,"cancle");
+                setPayment(removePrice,"cancle");
             }
         });
         order_price = findViewById(R.id.menuactivity_text_price);
@@ -1020,9 +1019,9 @@ public class MenuActivity extends AppCompatActivity{
 
     public void setPayment(String amount, String type) {
         Log.d("daon", "payment = " + amount);
-//        amount = "3000";
-//        prevAuthNum = "76046232    ";
-//        prevAuthDate = "210503";
+        amount = "54000";
+        prevAuthNum = "36217123    ";
+        prevAuthDate = "210523";
         int i_amount = Integer.parseInt(amount);
         int tax = (i_amount/100)*10;
         int aamount = (i_amount/100)*90;
@@ -1074,8 +1073,8 @@ public class MenuActivity extends AppCompatActivity{
             //신용 무카드 취소 호출부
             m_hash.put("TelegramType", "0420".getBytes()); // 전문 구분 ,  승인(0200) 취소(0420)
             m_hash.put("ReceiptNo", "X".getBytes());      // 현금영수증 거래필드, 신용결제 시 "X", 현금영수증 카드거래시 "", Key-In거래시 "휴대폰번호 등 입력" -> Pos Entry Mode 'K;
-            m_hash.put("VanTr", vanTr.getBytes());        // 거래고유번호 , 무카드 취소일 경우 필수 필드
-            m_hash.put("Cardbin", prevCardNo.getBytes());
+            m_hash.put("VanTr", "011754615".getBytes());        // 거래고유번호 , 무카드 취소일 경우 필수 필드
+            m_hash.put("Cardbin", "465887**********".getBytes());
             m_hash.put("AuthNum", prevAuthNum.getBytes());
             m_hash.put("Authdate", prevAuthDate.getBytes());
         }
