@@ -1109,7 +1109,6 @@ public class MenuActivity extends AppCompatActivity{
                 prevCardNo = m_hash.get("CardNo");
 
                 //KTC 인증용 출력
-                Log.d("payment", "recv [Classification]:: " + (m_hash.get("Classification")));
                 System.out.println("recv [TelegramType]:: " + (m_hash.get("TelegramType")));
                 System.out.println("recv [Dpt_Id]:: " + (m_hash.get("Dpt_Id")));
                 System.out.println("recv [Enterprise_Info]:: " + (m_hash.get("Enterprise_Info")));
@@ -1135,10 +1134,8 @@ public class MenuActivity extends AppCompatActivity{
                 System.out.println("recv [CardNo]:: " + (m_hash.get("CardNo")));
             }
 
-//            Toast.makeText(this, "성공" + (m_hash.get("AuthNum")), Toast.LENGTH_LONG).show();
-            if (!m_hash.get("AuthNum").replace(" ", "").equals("") || m_hash.get("AuthNum") == null){
+            if (m_hash.get("VanTr") == null){
                 Toast.makeText(this, m_hash.get("Message1"), Toast.LENGTH_LONG).show();
-
             }else {
                 Retrofit retrofit = new Retrofit.Builder()
                         .baseUrl("http://15.164.232.164:5000/")
@@ -1175,8 +1172,6 @@ public class MenuActivity extends AppCompatActivity{
                     }
                 });
             }
-
-
         } else if (resultCode == RESULT_FIRST_USER && data != null) {
             //케이에스체크IC 초기버전 이후 가맹점 다운로드 없이 승인 가능
             //Toast.makeText(this, "케이에스체크IC 에서 가맹점 다운로드 후 사용하시기 바랍니다", Toast.LENGTH_LONG).show();
